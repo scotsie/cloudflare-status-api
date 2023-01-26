@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
+
+import argparse
+import requests
+
+class CloudflareStatusAPI(requests.Session):
+    def fetch_components(self, url):
+        # grab all the components and information from the API
+        response = self.get('https://' + url + '/api/v2/components.json')
+        components = {}
+        if response.status_code == 200:
+            components = response.json().get("components")
+            return components
+        else:
+            raise Exception("Invalid Request: " + str(response.status_code))
+
+
+    def modify_strings(data):
+        # deal with characters causing parsing issues
+        if isinstance(data, str):
+            mod_data = data.encode("ascii","ignore")
+            mod_data = mod_data.decode()
+            mod_data = mod_data.replace("’", "!")
+            mod_data = mod_data.replace(" ","_")
+            return mod_data
+        else:
+            return data
+
+
+if __name__ == '__main__':
+    arg_parser = argparse.ArgumentParser(
+        prog = 'agent_cloudflare_status_api',
+        description = 'Queries the Cloudflare API for information',
+        epilog = 'Check is a work in progress written for CheckMK as a special agent.'
+        )
+    arg_parser.add_argument(
+        '-u', '--url',
+        help="The URL to query for API info, default www.cloudflarestatus.com.",
+        default='www.cloudflarestatus.com'
+    )
+    args = arg_parser.parse_args()
+
+
+    session = CloudflareStatusAPI()
+
+    components = session.fetch_components(args.url)
+    print('<<<cloudflare_status_api>>>')
+    for component in components:
+        output = f'{component["id"]} {CloudflareStatusAPI.modify_strings(component["name"])} {component["status"]} {component["group_id"]} {component["group"]}'
+        if "components" in component:
+            output += ' '
+            for subsite in component["components"]:
+                output += f'{subsite},'
+            output = output.rstrip(',')
+        else:
+            output += ' None'
+        print(output)
