@@ -11,6 +11,7 @@ Example of string_table input for parsing
 [['38w9dn5m8n4p','Tianjin,_China_-_(TSN)','operational','77867vxkttgw','False','None'],]
 """
 
+from .agent_based_api.v1 import *
 
 def parse_cloudflare_status_api(string_table):
     parsed = []
@@ -38,15 +39,18 @@ def discovery_cloudflare_status_api(parsed):
     for site in parsed:
         # filter for the group
         if site["group_id"] == "1km35smx8p41" or site["group"] == 'True':
-            yield Service(site["name"])
+            yield Service(item=site["name"])
 
 
 def check_cloudflare_status_api(item, params, parsed):
     # default to Unknown
-    exit_code = 2
+    exit_code = state.OK
     # Notify if empty parsed input
     if parsed == []:
-        yield 3, 'No pool data available'
+        yield Result(
+            state.CRIT,
+            summary='No pool data available'
+        )
     # Filter on the item passed and exit_code
     else:
         for site in parsed:
@@ -54,24 +58,26 @@ def check_cloudflare_status_api(item, params, parsed):
                 output = f'{site["name"]}'
                 if site["status"] == "operational":
                     output += ' is fully operational.'
-                    exit_code = 0
+                    exit_code = state.OK
                 elif site["status"] == "partial_outage":
                     output +=  ' is in a partial outage.'
-                    exit_code = 1
+                    exit_code = state.WARN
                 elif site["status"] == "degraded_performance":
                     output +=  ' is experiencing degraded performance.'
-                    exit_code = 1
+                    exit_code = state.WARN
                 else:
                     output +=  ' is in an unidentified or critical state.'
-                    exit_code = 2
-        yield exit_code, output, 'detailed output'
+                    exit_code = state.CRIT
+        yield Result(
+            state=exit_code,
+            summary=output,
+            details='detailed output'
+        )
 
-
-check_info['cloudflare_status_api'] = {
-    'check_function': check_cloudflare_status_api,
-    'inventory_function': discovery_cloudflare_status_api,
-    'parse_function': parse_cloudflare_status_api,
-    'service_description': 'Cloudflare Service %s',
-    'has_perfdata': False,
-    'group': 'cloudflare_status_api_group',
-}
+register.check_plugin(
+    name = "cloudflare_status_api",
+    service_name = "Cloudflare Service %s",
+    discovery_function = discovery_cloudflare_status_api,
+    check_function = check_cloudflare_status_api,
+    parse_function = parse_cloudflare_status_api,
+)
