@@ -84,28 +84,28 @@ def check_cloudflare_status_api(item, section) -> CheckResult:
                     yield Result(
                        state = State.OK,
                        summary = f"{output} is fully operational.",
-                       details = f"{summary}\n{detail}",
+                       details = f"{detail}",
                     )
                 # results if partial outage
                 elif site["status"] == "partial_outage":
                     yield Result(
                        state = State.WARN,
                        summary = f"{output} is in a partial outage.",
-                       details = f"{summary}\n{detail}",
+                       details = f"{detail}",
                     )
                 # results if degraded
                 elif site["status"] == "degraded_performance":
                     yield Result(
                        state = State.WARN,
                        summary = f"{output} is experiencing degraded performance.",
-                       details = f"{summary}\n{detail}",
+                       details = f"{detail}",
                     )
                 # anything currently not planned for.
                 else:
                     yield Result(
                        state = State.CRIT,
                        summary = f"{output} is in an unidentified or critical state.",
-                       details = f"{summary}\n{detail}",
+                       details = f"{detail}",
                     )
 
 
