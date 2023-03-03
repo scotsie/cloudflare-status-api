@@ -71,14 +71,15 @@ def check_cloudflare_status_api(item, section) -> CheckResult:
         for site in section:
             if site["name"] == item:
                 output = f'{site["name"]}'
-                detail = f"{output}\n"
+                detail = f"{output} subcomponents if any:\n"
                 if site["components"] != "None":
                     # iterate through the subcomponents of the site and 
                     # add them as details if they are not operational.
-                    for subcomponent in site["components"]:
+                    for subcomponent in site["components"].split(","):
                         res = list(filter(lambda section: section["id"] == subcomponent, section))
-                        if res[0]["status"] != "operational":
-                            detail += f'{res[0]["name"]}-{res[0]["status"]}\\n'
+                        #if res[0]["status"] != "operational":
+                            #detail += f'{res[0]["name"]}-{res[0]["status"]}\\n'
+                        detail += f'{res[0]["name"]}-{res[0]["status"]}\\n'
                 # Results if operational            
                 if site["status"] == "operational":
                     yield Result(
