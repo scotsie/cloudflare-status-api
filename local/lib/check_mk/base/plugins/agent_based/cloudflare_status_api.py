@@ -71,7 +71,7 @@ def check_cloudflare_status_api(item, section) -> CheckResult:
         for site in section:
             if site["name"] == item:
                 output = f'{site["name"]}'
-                detail = ""
+                detail = f"{output}\n"
                 if site["components"] != "None":
                     # iterate through the subcomponents of the site and 
                     # add them as details if they are not operational.
