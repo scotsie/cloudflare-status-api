@@ -1,0 +1,6 @@
+# Ignore everything
+*
+# Don't ignore .gitignore and *.foo files
+!.gitignore
+!ReadME.md
+!./
