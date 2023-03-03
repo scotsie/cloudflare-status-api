@@ -71,10 +71,10 @@ def check_cloudflare_status_api(item, section) -> CheckResult:
         for site in section:
             if site["name"] == item:
                 output = f'{site["name"]}'
-                detail = f"{output} subcomponents if any:\n"
                 if site["components"] != "None":
+                    detail = f"{output} subcomponent-status:\n"
                     # iterate through the subcomponents of the site and 
-                    # add them as details if they are not operational.
+                    # add them as details if they exist.
                     for subcomponent in site["components"].split(","):
                         res = list(filter(lambda section: section["id"] == subcomponent, section))
                         #if res[0]["status"] != "operational":
@@ -101,7 +101,8 @@ def check_cloudflare_status_api(item, section) -> CheckResult:
                        summary = f"{output} is experiencing degraded performance.",
                        details = f"{detail}",
                     )
-                # anything currently not planned for.
+                # anything currently not observed in status
+                # outage or other status.
                 else:
                     yield Result(
                        state = State.CRIT,
