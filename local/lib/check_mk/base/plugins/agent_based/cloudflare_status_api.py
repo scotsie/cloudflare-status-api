@@ -57,7 +57,7 @@ def discover_cloudflare_status_api(section) -> DiscoveryResult:
     else:
         for site in section:
             # filter for the group or site and yield name as the item.
-            if site["group_id"] == "1km35smx8p41" or site["group"] == 'True':
+            if site["group_id"] == "1km35smx8p41" or site["group"] == "True":
                 yield Service(item=site["name"])
 
 
@@ -71,29 +71,41 @@ def check_cloudflare_status_api(item, section) -> CheckResult:
         for site in section:
             if site["name"] == item:
                 output = f'{site["name"]}'
+                detail = ""
+                if site["components"]:
+                    # iterate through the subcomponents of the site and 
+                    # add them as details if they are not operational.
+                    for subcomponent in component["components"]:
+                        res = list(filter(lambda section: section["id"] == subcomponent, section))
+                        if res[0]["status"] != "operational":
+                            detail += f'{res[0]["name"]}-{res[0]["status"]}\\n'
+                # Results if operational            
                 if site["status"] == "operational":
                     yield Result(
                        state = State.OK,
                        summary = f"{output} is fully operational.",
-                       details = "detailed\nmultiline\noutput."
+                       details = f"{summary}\n{detail}",
                     )
+                # results if partial outage
                 elif site["status"] == "partial_outage":
                     yield Result(
                        state = State.WARN,
                        summary = f"{output} is in a partial outage.",
-                       details = "detailed\nmultiline\noutput."
+                       details = f"{summary}\n{detail}",
                     )
+                # results if degraded
                 elif site["status"] == "degraded_performance":
                     yield Result(
                        state = State.WARN,
                        summary = f"{output} is experiencing degraded performance.",
-                       details = "detailed\nmultiline\noutput."
+                       details = f"{summary}\n{detail}",
                     )
+                # anything currently not planned for.
                 else:
                     yield Result(
                        state = State.CRIT,
                        summary = f"{output} is in an unidentified or critical state.",
-                       details = "detailed\nmultiline\noutput."
+                       details = f"{summary}\n{detail}",
                     )
 
 
