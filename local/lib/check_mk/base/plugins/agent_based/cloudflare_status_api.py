@@ -71,6 +71,7 @@ def check_cloudflare_status_api(item, section) -> CheckResult:
         for site in section:
             if site["name"] == item:
                 output = f'{site["name"]}'
+                detail = None
                 if site["components"] != "None":
                     detail = f"{output} subcomponent-status:\n"
                     # iterate through the subcomponents of the site and 
@@ -85,21 +86,21 @@ def check_cloudflare_status_api(item, section) -> CheckResult:
                     yield Result(
                        state = State.OK,
                        summary = f"{output} is fully operational.",
-                       details = f"{detail}",
+                       details = detail,
                     )
                 # results if partial outage
                 elif site["status"] == "partial_outage":
                     yield Result(
                        state = State.WARN,
                        summary = f"{output} is in a partial outage.",
-                       details = f"{detail}",
+                       details = detail,
                     )
                 # results if degraded
                 elif site["status"] == "degraded_performance":
                     yield Result(
                        state = State.WARN,
                        summary = f"{output} is experiencing degraded performance.",
-                       details = f"{detail}",
+                       details = detail,
                     )
                 # anything currently not observed in status
                 # outage or other status.
@@ -107,7 +108,7 @@ def check_cloudflare_status_api(item, section) -> CheckResult:
                     yield Result(
                        state = State.CRIT,
                        summary = f"{output} is in an unidentified or critical state.",
-                       details = f"{detail}",
+                       details = detail,
                     )
 
 
