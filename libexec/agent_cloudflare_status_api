@@ -4,6 +4,7 @@
 import argparse
 import requests
 
+
 class CloudflareStatusAPI(requests.Session):
     def fetch_components(self, url):
         # grab all the components and information from the API
@@ -36,8 +37,8 @@ if __name__ == '__main__':
         )
     arg_parser.add_argument(
         '-u', '--url',
-        help="The URL to query for API info, default www.cloudflarestatus.com.",
-        default='www.cloudflarestatus.com'
+        help = "The URL to query for API info, default www.cloudflarestatus.com.",
+        default = 'www.cloudflarestatus.com'
     )
     args = arg_parser.parse_args()
 
