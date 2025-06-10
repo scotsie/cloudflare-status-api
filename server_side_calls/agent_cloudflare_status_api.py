@@ -1,21 +1,31 @@
 #!/usr/bin/env python3
+# -*- encoding: utf-8; py-indent-offset: 4 -*-
 
-from cmk.server_side_calls.v1 import noop_parser, SpecialAgentConfig, SpecialAgentCommand
+from collections.abc import Iterator
+from pydantic import BaseModel
+from cmk.server_side_calls.v1 import (
+    HostConfig,
+    noop_parser,
+    SpecialAgentConfig,
+    SpecialAgentCommand
+)
 
+class Params(BaseModel):
+    url: str | None = "www.cloudflarestatus.com"
 
-#Function get params (in this case is URL, passed via WATO rule cunfiguration, hostname and ip addres of host,
-#for which agent will be invoked
-def agent_cloudflare_status_api_arguments(params):
+def _agent_cloudflare_status_api_arguments(
+    params: Params,
+    host_config: HostConfig
+    ) -> Iterator[SpecialAgentCommand]:
     args = []
-    _url = params['url']
-    if _url:
-       args += ['-u',_url]
+    if params['url']:
+       args += ['-u', params['url']]
     yield SpecialAgentCommand(command_arguments=args)
 
 #register invoke function for our agent
 #key value for this dictionary is name part from register datasource of our agent (name="special_agents:myspecial" remember?)
-special_agent_cloudflare_status_api= SpecialAgentConfig(
+special_agent_cloudflare_status_api=SpecialAgentConfig(
     name="cloudflare_status_api",
     parameter_parser=noop_parser,
-    commands_function=agent_cloudflare_status_api_arguments
+    commands_function=_agent_cloudflare_status_api_arguments
 )
