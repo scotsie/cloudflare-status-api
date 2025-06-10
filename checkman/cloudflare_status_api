@@ -1,0 +1,15 @@
+title: Cloudflare Status API Checker
+agents: special_agent
+catalog: tbd
+license: GPL
+distribution: github
+description:
+ Monitor the Cloudflare Services through their public API.
+ Will discover all services filtering on groups and the
+ top level services.
+ Status will be checked and OK for operational, WARN for
+ degraded or partial outages and CRIT for any other states.
+
+inventory:
+ One item per service discovered marked as a group or with 
+ the group_id 1km35smx8p41 which looks to be the parent site.
