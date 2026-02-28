@@ -50,7 +50,7 @@ import json
 
 
 def parse_cloudflare_status_api(string_table):
-    return json.loads(string_table[0])
+    return json.loads(string_table[0][0])
 
 
 agent_section_cloudflare_status_api = AgentSection(
