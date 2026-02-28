@@ -32,7 +32,7 @@ if __name__ == "__main__":
         default="www.cloudflarestatus.com"
     )
     args = arg_parser.parse_args()
-    session=CloudflareStatusAPI()
+    session = CloudflareStatusAPI()
     components = session.fetch_components(args.url)
     print("<<<cloudflare_status_api:sep(0)>>>")
     print(json.dumps(components, separators=(',', ':')))
