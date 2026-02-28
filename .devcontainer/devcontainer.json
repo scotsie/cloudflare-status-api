@@ -40,6 +40,11 @@
 	//"containerUser": "cmk",
 	//"runArgs": ["--userns=keep-id"],
 
+	// Mount host git config so global user.name/email are available without manual setup after rebuild
+	"mounts": [
+		"source=${localEnv:USERPROFILE}\\.gitconfig,target=/omd/sites/cmk/.gitconfig,type=bind,consistency=cached"
+	],
+
 	"remoteEnv": {
 		"PATH": "/omd/sites/cmk/bin:/omd/sites/cmk/local/lib/python3/bin/:${containerEnv:PATH}",
 		"OMD_ROOT": "/omd/sites/cmk",
