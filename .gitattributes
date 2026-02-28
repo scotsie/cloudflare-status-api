@@ -1,0 +1,7 @@
+# Normalise line endings to LF for all text files on checkout.
+# This prevents Windows CRLF endings from breaking shell script shebangs
+# and other tooling when the workspace is mounted into a Linux container.
+* text=auto eol=lf
+
+# Explicitly mark shell scripts as text with LF and executable.
+*.sh text eol=lf
