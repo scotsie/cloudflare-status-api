@@ -13,10 +13,17 @@ For usage
     * Add your dummy host to the explicit hosts list.
 4. Perform a Service Discovery on your desired host.
 5. Choose which services to ignore or monitor.
-6. Commit your changes.
+6. Activate your changes.
+
+## How it works
+
+The special agent (`libexec/agent_cloudflare_status_api`) queries `https://<url>/api/v2/components.json` and outputs the components list as compact JSON under the `<<<cloudflare_status_api:sep(0)>>>` section header.
+
+The check plugin (`agent_based/cloudflare_status_api.py`) parses the JSON and discovers services from two categories:
+- Subcomponents of "Cloudflare Sites and Services" (group ID `1km35smx8p41`)
+- Top-level regional groups (Europe, Asia, Africa, North America, etc.)
 
 TO DO:  
-* Swap to using JSON output on data query (didn't know it support it originally)
 * Consolidate yield statements
 * More meaningful webui options?
 * Is a URL necessary since it defaults and isn't part of the check, only the script to pull data.
