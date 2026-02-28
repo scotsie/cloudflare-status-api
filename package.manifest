@@ -11,11 +11,11 @@
          'download_url': 'https://github.com/scotsie/cloudflare-status-api',
          'files': {
                 'cmk_addons_plugins': [
-                        'cloudflare-status-api/agent_based/cloudflare_status_api.py',
-                        'cloudflare-status-api/checkman/cloudflare_status_api',
-                        'cloudflare-status-api/libexec/agent_cloudflare_status_api',
-                        'cloudflare-status-api/rulesets/cloudflare_status_api_register.py',
-                        'cloudflare-status-api/server_side_calls/agent_cloudflare_status_api.py']},
+                        'cloudflare_status_api/agent_based/cloudflare_status_api.py',
+                        'cloudflare_status_api/checkman/cloudflare_status_api',
+                        'cloudflare_status_api/libexec/agent_cloudflare_status_api',
+                        'cloudflare_status_api/rulesets/cloudflare_status_api_register.py',
+                        'cloudflare_status_api/server_side_calls/agent_cloudflare_status_api.py']},
         'name': 'cloudflare_status_api',
         'title': 'Cloudflare Status API Special Agent',
         'version': '2.3.2',
