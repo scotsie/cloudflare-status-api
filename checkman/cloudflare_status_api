@@ -5,9 +5,11 @@ license: GPL
 distribution: github
 description:
  Monitor the Cloudflare Services through their public API.
- By default one service per group is discovered (e.g. "Europe",
- "Cloudflare Sites and Services"), with individual datacenters or
- components listed only in the group service's details.
+ By default, regional groups (e.g. "Europe") are discovered as
+ one rolled-up service each, with their individual datacenters
+ listed only in that service's details. Members of the flat
+ "Cloudflare Sites and Services" catch-all group are discovered
+ individually since there is no further logical grouping for them.
  Status will be checked and OK for operational, WARN for
  degraded performance, partial outages or planned maintenance,
  and CRIT for major outages or any other unidentified state.

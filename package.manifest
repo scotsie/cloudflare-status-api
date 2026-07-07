@@ -1,16 +1,23 @@
 {
         'author': 'Scotsie (mscottcrace@gmail.com)',
         'description': 'Monitor the Cloudflare Services through their public API. '
-                       'By default, discovers one service per group (e.g. '
-                       '"Europe"). The "Cloudflare Status API discovery" ruleset '
-                       'can disable grouping and filter by name to discover '
-                       'individual datacenters/components instead. '
+                       'By default, regional groups (e.g. "Europe") are '
+                       'discovered as one rolled-up service each, with their '
+                       'individual datacenters listed only in that service\'s '
+                       'details; members of the flat "Cloudflare Sites and '
+                       'Services" catch-all group are discovered individually '
+                       'since there is no further logical grouping for them. '
+                       'The "Cloudflare Status API discovery" ruleset can '
+                       'disable grouping entirely and filter by name to '
+                       'discover any individual component instead. '
                        'Status will be checked and OK for operational, WARN for '
                        '"degraded", "partial outages" or "under maintenance" and '
                        'CRIT for "major outages" or any other currently '
                        'unidentified state. '
-                       'For sites with subcomponents, the details will contain '
-                       'the non-operational subcomponent(s) name and status.',
+                       'A rolled-up group service\'s details list only its '
+                       'non-operational subcomponents (plus an "N/M operational" '
+                       'count) to avoid exceeding Checkmk\'s long-output size '
+                       'limit.',
          'download_url': 'https://github.com/scotsie/cloudflare-status-api',
          'files': {
                 'cmk_addons_plugins': [
