@@ -44,8 +44,10 @@ Example output from special agent:
     }
 ]
 """
-from cmk.agent_based.v2 import AgentSection, CheckPlugin, IgnoreResultsError, Result, Service, State
-from cmk.agent_based.v2 import CheckResult, DiscoveryResult
+from cmk.agent_based.v2 import (
+    AgentSection, CheckPlugin, CheckResult, DiscoveryResult,
+    IgnoreResultsError, Result, RuleSetType, Service, State,
+)
 import json
 
 
@@ -58,14 +60,35 @@ agent_section_cloudflare_status_api = AgentSection(
     parse_function=parse_cloudflare_status_api,
 )
 
+# id of the "Cloudflare Sites and Services" top-level group. Unlike
+# regional groups (which group real datacenters), this one is a flat
+# catch-all with no logical sub-grouping, so its direct children are
+# discovered individually rather than rolled up.
+SITES_AND_SERVICES_GROUP_ID = "1km35smx8p41"
 
-def discover_cloudflare_status_api(section) -> DiscoveryResult:
+
+def discover_cloudflare_status_api(params, section) -> DiscoveryResult:
     if section is None:
         return
-    else:
+    mode, filters = params.get("grouping", ("enabled", None))
+    if mode == "enabled":
+        # regional groups become a single rolled-up service; individual
+        # datacenters within them are only visible in the group's
+        # details text. Direct children of the top-level catch-all
+        # group are discovered individually since there's no
+        # meaningful grouping for them beyond that.
         for site in section:
-            # filter for the group or site and yield name as the item.
-            if site["group_id"] == "1km35smx8p41" or site["group"]:
+            if site["group"] or site["group_id"] == SITES_AND_SERVICES_GROUP_ID:
+                yield Service(item=site["name"])
+    else:
+        # flat: every component whose name matches a filter fragment
+        # (or every component, if no filters are configured) becomes
+        # its own service.
+        fragments = [f.lower() for f in (filters or [])]
+        for site in section:
+            if not fragments or any(
+                frag in site["name"].lower() for frag in fragments
+            ):
                 yield Service(item=site["name"])
 
 
@@ -81,16 +104,24 @@ def check_cloudflare_status_api(item, section) -> CheckResult:
                 output = f'{site["name"]}'
                 detail = None
                 if site.get("components"):
-                    detail = f"{output} subcomponent-status:\n"
-                    # iterate through the subcomponents of the site and 
-                    # add them as details if they exist.
-                    for subcomponent in site["components"]:
-                        res = list(filter(
-                            lambda s: s["id"] == subcomponent,
-                            section
-                        ))
-                        detail += f'{res[0]["name"]}-{res[0]["status"]}\\n'
-                # Results if operational            
+                    # only list subcomponents that aren't operational -
+                    # a fully expanded listing can push the details text
+                    # past Checkmk's long-output size limit.
+                    subcomponents = [
+                        next(s for s in section if s["id"] == cid)
+                        for cid in site["components"]
+                    ]
+                    non_operational = [
+                        s for s in subcomponents if s["status"] != "operational"
+                    ]
+                    detail = (
+                        f"{output} subcomponent-status "
+                        f"({len(subcomponents) - len(non_operational)}/"
+                        f"{len(subcomponents)} operational):\n"
+                    )
+                    for sub in non_operational:
+                        detail += f'{sub["name"]}-{sub["status"]}\\n'
+                # Results if operational
                 if site["status"] == "operational":
                     yield Result(
                        state=State.OK,
@@ -111,6 +142,20 @@ def check_cloudflare_status_api(item, section) -> CheckResult:
                        summary=f"{output} is experiencing degraded performance.",
                        details=detail,
                     )
+                # results if under planned maintenance
+                elif site["status"] == "under_maintenance":
+                    yield Result(
+                       state=State.WARN,
+                       summary=f"{output} is under maintenance.",
+                       details=detail,
+                    )
+                # results if a major outage
+                elif site["status"] == "major_outage":
+                    yield Result(
+                       state=State.CRIT,
+                       summary=f"{output} is in a major outage.",
+                       details=detail,
+                    )
                 # anything currently not observed in status
                 # outage or other status.
                 else:
@@ -126,5 +171,8 @@ check_plugin_cloudflare_status_api = CheckPlugin(
     name="cloudflare_status_api",
     service_name="Cloudflare Service %s",
     discovery_function=discover_cloudflare_status_api,
+    discovery_default_parameters={"grouping": ("enabled", None)},
+    discovery_ruleset_name="cloudflare_status_api_discovery",
+    discovery_ruleset_type=RuleSetType.MERGED,
     check_function=check_cloudflare_status_api,
 )

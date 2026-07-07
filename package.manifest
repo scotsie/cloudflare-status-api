@@ -1,13 +1,16 @@
 {
         'author': 'Scotsie (mscottcrace@gmail.com)',
         'description': 'Monitor the Cloudflare Services through their public API. '
-                       'Will discover all services filtering on group = "True" '
-                       'or the top level services where group_id = "1km35smx8p41". '
+                       'By default, discovers one service per group (e.g. '
+                       '"Europe"). The "Cloudflare Status API discovery" ruleset '
+                       'can disable grouping and filter by name to discover '
+                       'individual datacenters/components instead. '
                        'Status will be checked and OK for operational, WARN for '
-                       '"degraded" or "partial outages" and CRIT for "major outages" '
-                       'or any other currently unidentified state.'
-                       'For sites with subcomponents, the details will contain the '
-                       'subcomponent(s) name and current status.',
+                       '"degraded", "partial outages" or "under maintenance" and '
+                       'CRIT for "major outages" or any other currently '
+                       'unidentified state. '
+                       'For sites with subcomponents, the details will contain '
+                       'the non-operational subcomponent(s) name and status.',
          'download_url': 'https://github.com/scotsie/cloudflare-status-api',
          'files': {
                 'cmk_addons_plugins': [
@@ -18,7 +21,7 @@
                         'cloudflare_status_api/server_side_calls/agent_cloudflare_status_api.py']},
         'name': 'cloudflare_status_api',
         'title': 'Cloudflare Status API Special Agent',
-        'version': '2.3.3',
+        'version': '2.3.4',
         'version.min_required': '2.3.0p12',
         'version.packaged': '2.3.0p19',
         'version.usable_until': None

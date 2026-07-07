@@ -5,11 +5,26 @@ license: GPL
 distribution: github
 description:
  Monitor the Cloudflare Services through their public API.
- Will discover all services filtering on groups and the
- top level services.
+ By default one service per group is discovered (e.g. "Europe",
+ "Cloudflare Sites and Services"), with individual datacenters or
+ components listed only in the group service's details.
  Status will be checked and OK for operational, WARN for
- degraded or partial outages and CRIT for any other states.
+ degraded performance, partial outages or planned maintenance,
+ and CRIT for major outages or any other unidentified state.
+ A group service's details only list its non-operational
+ subcomponents (plus an "N/M operational" count) to avoid
+ exceeding Checkmk's long-output size limit.
+
+ The "Cloudflare Status API discovery" ruleset controls this:
+ with "Grouping enabled" (the default) only the groups are
+ discovered. With "Grouping disabled", a name filter is shown -
+ every API component (group or leaf) whose name contains one of
+ the given strings (case-insensitive) is discovered as its own
+ service; leave the filter empty to discover every component
+ individually. A bare 3-letter airport code can match unrelated
+ words (e.g. "fra" also matches "France"), so include the
+ parentheses (e.g. "(FRA)") or use the full city name.
 
 inventory:
- One item per service discovered marked as a group or with 
- the group_id 1km35smx8p41 which looks to be the parent site.
+ One item per service discovered, as controlled by the
+ "Cloudflare Status API discovery" ruleset (see above).
