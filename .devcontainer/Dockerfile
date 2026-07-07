@@ -1,8 +1,8 @@
 # See here for image contents: https://github.com/microsoft/vscode-dev-containers/tree/v0.155.1/containers/ubuntu/.devcontainer/base.Dockerfile
 
-# [Choice] CheckMK version: 2.4.0-latest
-ARG VARIANT="2.3.0-latest"
-FROM checkmk/check-mk-managed:${VARIANT}
+# [Choice] CheckMK version: 2.5.0-latest
+ARG VARIANT="2.5.0-latest"
+FROM checkmk/check-mk-ultimatemt:${VARIANT}
 
 RUN /docker-entrypoint.sh /bin/true
 
